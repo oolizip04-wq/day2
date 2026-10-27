@@ -257,6 +257,52 @@
     .wish li.empty { background: none; border-left: none; color: var(--muted); text-align: center; }
     .tips { margin: 0; padding-left: 1.1rem; color: #c9d4de; font-size: 0.88rem; line-height: 1.8; }
 
+    /* gallery */
+    #gallery { margin-top: 1.25rem; border-top-color: var(--citrus); }
+    .gallery-msg { min-height: 1.3rem; margin: 0 0 0.6rem; color: #ff8a8a; font-size: 0.88rem; }
+    .slider { border: 1px solid var(--line); background: var(--bg); }
+    .slider[hidden] { display: none; }
+    .stage { position: relative; height: 420px; overflow: hidden; background: #05080c; }
+    .track { display: flex; height: 100%; transition: transform 0.4s ease; }
+    .slide { flex: none; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
+    .slide img { max-width: 100%; max-height: 100%; object-fit: contain; }
+    .arrow {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 2.6rem;
+      height: 4rem;
+      padding: 0;
+      border: none;
+      background: rgba(11, 15, 20, 0.75);
+      color: var(--ink);
+      font-size: 1.3rem;
+      cursor: pointer;
+    }
+    .arrow:hover { background: var(--accent); color: #04211d; }
+    #g-prev { left: 0; }
+    #g-next { right: 0; }
+    .g-info { display: flex; justify-content: space-between; gap: 1rem; padding: 0.7rem 0.9rem; color: var(--muted); font-size: 0.82rem; }
+    .g-info a { color: var(--accent); text-decoration: none; }
+    .dots { display: flex; justify-content: center; gap: 0.4rem; padding: 0 1rem 0.8rem; }
+    .dot { width: 22px; height: 4px; padding: 0; border: none; background: var(--line); cursor: pointer; }
+    .dot.active { background: var(--accent); }
+    .g-more {
+      display: block;
+      width: calc(100% - 1.8rem);
+      margin: 0 auto 0.9rem;
+      padding: 0.6rem 1rem;
+      border: 1px solid var(--accent);
+      background: transparent;
+      color: var(--accent);
+      font-size: 0.88rem;
+      font-weight: 800;
+      cursor: pointer;
+    }
+    .g-more:hover:not(:disabled) { background: var(--accent); color: #04211d; }
+    .g-more:disabled { border-color: var(--line); color: #5b6876; cursor: default; }
+    .credit { margin: 0.8rem 0 0; color: var(--muted); font-size: 0.74rem; text-align: right; }
+
     /* footer */
     footer {
       margin: 2rem -1rem -2rem;
@@ -290,6 +336,7 @@
       <a href="#products">대표 특산물</a>
       <a href="#why">제주 감귤 이야기</a>
       <a href="#fact-box">알아보기</a>
+      <a href="#gallery">이미지</a>
       <a href="#contact">소개</a>
     </nav>
 
@@ -417,6 +464,30 @@
       </aside>
     </div>
 
+    <section class="box" id="gallery">
+      <h2>🖼️ 제주 이미지 갤러리</h2>
+      <p class="lead">궁금한 것을 검색하면 사진을 10장씩 슬라이드로 보여드려요.</p>
+      <form id="gallery-form" class="add-form">
+        <input id="gallery-query" type="text" value="제주도" placeholder="예: 감귤, 한라산, 바다" autocomplete="off">
+        <button type="submit">검색</button>
+      </form>
+      <p id="gallery-msg" class="gallery-msg"></p>
+      <div class="slider" id="slider" hidden>
+        <div class="stage">
+          <div class="track" id="track"></div>
+          <button type="button" class="arrow" id="g-prev" aria-label="이전">◀</button>
+          <button type="button" class="arrow" id="g-next" aria-label="다음">▶</button>
+        </div>
+        <div class="g-info">
+          <span id="g-counter"></span>
+          <span id="g-source"></span>
+        </div>
+        <div class="dots" id="dots"></div>
+        <button type="button" id="g-more" class="g-more">다음 10개 불러오기</button>
+      </div>
+      <p class="credit">Images from Pixabay</p>
+    </section>
+
     <footer id="contact">
       <strong>제주 특산물 이야기</strong><br>
       바다와 한라산이 키운 제주의 맛을 소개합니다.<br>
@@ -500,6 +571,92 @@
     document.getElementById('today-desc').textContent = pick.desc;
     document.getElementById('today-tip').textContent = '💬 ' + pick.tip;
     document.getElementById('today-add').addEventListener('click', () => addWish(pick.name));
+
+    // 이미지 갤러리 (Vercel 함수 /api/pixabay 를 통해 Pixabay 호출)
+    const gForm = document.getElementById('gallery-form');
+    const gQuery = document.getElementById('gallery-query');
+    const gMsg = document.getElementById('gallery-msg');
+    const gSlider = document.getElementById('slider');
+    const gTrack = document.getElementById('track');
+    const gDots = document.getElementById('dots');
+    const gMore = document.getElementById('g-more');
+    let gHits = [], gCurrent = 0, gPage = 1, gTotal = 0, gTerm = '';
+
+    async function gLoad(term, page) {
+      gMsg.style.color = '';
+      gMsg.textContent = '불러오는 중...';
+      try {
+        const res = await fetch('/api/pixabay?' + new URLSearchParams({ q: term, page }));
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.error || '불러오지 못했어요. (' + res.status + ')');
+        if (!data.hits.length) throw new Error('검색 결과가 없어요.');
+        gHits = data.hits;
+        gTotal = data.totalHits;
+        gMsg.textContent = '';
+        return true;
+      } catch (err) {
+        gMsg.textContent = err.message;
+        return false;
+      }
+    }
+
+    function gRender() {
+      gTrack.innerHTML = '';
+      gDots.innerHTML = '';
+      gHits.forEach((h, i) => {
+        const slide = document.createElement('div');
+        slide.className = 'slide';
+        const img = document.createElement('img');
+        img.src = h.src;
+        img.alt = h.tags;
+        slide.appendChild(img);
+        gTrack.appendChild(slide);
+
+        const dot = document.createElement('button');
+        dot.type = 'button';
+        dot.className = 'dot';
+        dot.setAttribute('aria-label', (i + 1) + '번째 이미지');
+        dot.addEventListener('click', () => gGo(i));
+        gDots.appendChild(dot);
+      });
+      gSlider.hidden = false;
+      gMore.disabled = gPage * 10 >= gTotal;
+      gGo(0);
+    }
+
+    function gGo(i) {
+      gCurrent = (i + gHits.length) % gHits.length;
+      gTrack.style.transform = 'translateX(' + (-100 * gCurrent) + '%)';
+      [...gDots.children].forEach((d, n) => d.classList.toggle('active', n === gCurrent));
+      const h = gHits[gCurrent];
+      document.getElementById('g-counter').textContent = (gCurrent + 1) + ' / ' + gHits.length + '  ·  ' + h.tags;
+      const src = document.getElementById('g-source');
+      src.innerHTML = '';
+      const a = document.createElement('a');
+      a.href = h.pageURL;
+      a.target = '_blank';
+      a.rel = 'noopener';
+      a.textContent = 'by ' + h.user;
+      src.appendChild(a);
+    }
+
+    async function gSearch(term) {
+      gTerm = term;
+      gPage = 1;
+      if (await gLoad(gTerm, gPage)) gRender();
+    }
+
+    gForm.addEventListener('submit', e => {
+      e.preventDefault();
+      const term = gQuery.value.trim();
+      if (term) gSearch(term);
+    });
+    gMore.addEventListener('click', async () => {
+      if (await gLoad(gTerm, gPage + 1)) { gPage++; gRender(); }
+    });
+    document.getElementById('g-prev').addEventListener('click', () => gGo(gCurrent - 1));
+    document.getElementById('g-next').addEventListener('click', () => gGo(gCurrent + 1));
+    gSearch(gQuery.value.trim());
 
     const addInput = document.getElementById('add-input');
     document.getElementById('add-form').addEventListener('submit', e => {

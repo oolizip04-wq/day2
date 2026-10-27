@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pixabay 이미지 슬라이드</title>
+  <style>
+    :root {
+      --bg: #0b0f14;
+      --surface: #131a22;
+      --line: #25303c;
+      --accent: #2dd4bf;
+      --ink: #e6edf3;
+      --muted: #8b98a6;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 2rem 1rem;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
+    }
+    .wrap { max-width: 760px; margin: 0 auto; }
+    h1 { margin: 0 0 1.5rem; font-size: 1.6rem; border-bottom: 3px solid var(--accent); padding-bottom: 0.7rem; }
+    .row { display: flex; gap: 0.5rem; margin-bottom: 0.8rem; }
+    label { display: block; margin-bottom: 0.3rem; color: var(--muted); font-size: 0.82rem; }
+    input {
+      flex: 1;
+      min-width: 0;
+      padding: 0.7rem 0.9rem;
+      border: 1px solid var(--line);
+      background: var(--surface);
+      color: var(--ink);
+      font-size: 0.95rem;
+      outline: none;
+    }
+    input:focus { border-color: var(--accent); }
+    button {
+      padding: 0.7rem 1.2rem;
+      border: none;
+      background: var(--accent);
+      color: #04211d;
+      font-size: 0.95rem;
+      font-weight: 800;
+      cursor: pointer;
+    }
+    button:hover { background: #5eead4; }
+    button:disabled { background: var(--line); color: var(--muted); cursor: default; }
+    .hint { margin: 0 0 1.2rem; color: var(--muted); font-size: 0.8rem; line-height: 1.6; }
+    #message { min-height: 1.4rem; margin: 0 0 0.8rem; color: #ff8a8a; font-size: 0.9rem; }
+
+    .slider { display: none; background: var(--surface); border: 1px solid var(--line); }
+    .slider.show { display: block; }
+    .stage { position: relative; height: 420px; background: #05080c; overflow: hidden; }
+    .track { display: flex; height: 100%; transition: transform 0.4s ease; }
+    .slide { flex: none; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
+    .slide img { max-width: 100%; max-height: 100%; object-fit: contain; }
+    .arrow {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 2.6rem;
+      height: 4rem;
+      padding: 0;
+      background: rgba(11, 15, 20, 0.7);
+      color: var(--ink);
+      font-size: 1.4rem;
+    }
+    .arrow:hover { background: var(--accent); color: #04211d; }
+    #prev { left: 0; }
+    #next { right: 0; }
+    .info { display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: 0.8rem 1rem; font-size: 0.85rem; color: var(--muted); }
+    .info a { color: var(--accent); text-decoration: none; }
+    .dots { display: flex; justify-content: center; gap: 0.4rem; padding: 0 1rem 0.9rem; }
+    .dot { width: 22px; height: 4px; padding: 0; background: var(--line); }
+    .dot:hover { background: #3a4a5a; }
+    .dot.active { background: var(--accent); }
+    .more { display: flex; justify-content: center; padding: 0 1rem 1rem; }
+    .credit { margin-top: 1rem; color: var(--muted); font-size: 0.75rem; text-align: center; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>🖼️ Pixabay 이미지 슬라이드</h1>
+
+    <label for="key">Pixabay API Key</label>
+    <div class="row">
+      <input id="key" type="password" placeholder="발급받은 API Key를 붙여넣으세요" autocomplete="off">
+    </div>
+    <p class="hint">키는 이 브라우저(localStorage)에만 저장되고 코드에는 들어가지 않아요. 코드나 GitHub에 키를 직접 적지 마세요.</p>
+
+    <label for="query">검색어</label>
+    <form id="form" class="row">
+      <input id="query" type="text" placeholder="예: 제주도, 감귤, 바다" autocomplete="off">
+      <button type="submit" id="search">검색</button>
+    </form>
+
+    <p id="message"></p>
+
+    <div class="slider" id="slider">
+      <div class="stage">
+        <div class="track" id="track"></div>
+        <button class="arrow" id="prev" aria-label="이전">◀</button>
+        <button class="arrow" id="next" aria-label="다음">▶</button>
+      </div>
+      <div class="info">
+        <span id="counter"></span>
+        <span id="source"></span>
+      </div>
+      <div class="dots" id="dots"></div>
+      <div class="more">
+        <button id="more">다음 10개 불러오기</button>
+      </div>
+    </div>
+
+    <p class="credit">Images from <a href="https://pixabay.com" target="_blank" rel="noopener" style="color:inherit">Pixabay</a></p>
+  </div>
+
+  <script>
+    const PER_PAGE = 10;
+    const $ = id => document.getElementById(id);
+    const keyEl = $('key'), queryEl = $('query'), messageEl = $('message');
+    const sliderEl = $('slider'), trackEl = $('track'), dotsEl = $('dots');
+    const counterEl = $('counter'), sourceEl = $('source'), moreBtn = $('more');
+
+    let hits = [], current = 0, page = 1, query = '', totalHits = 0;
+
+    try { keyEl.value = localStorage.getItem('pixabay_key') || ''; } catch (e) {}
+    keyEl.addEventListener('change', () => {
+      try { localStorage.setItem('pixabay_key', keyEl.value.trim()); } catch (e) {}
+    });
+
+    async function load(q, p) {
+      const key = keyEl.value.trim();
+      if (!key) { messageEl.textContent = 'API Key를 먼저 입력하세요.'; return false; }
+      const url = 'https://pixabay.com/api/?' + new URLSearchParams({
+        key, q, page: p, per_page: PER_PAGE, image_type: 'photo', lang: 'ko', safesearch: 'true'
+      });
+      messageEl.textContent = '불러오는 중...';
+      try {
+        const res = await fetch(url);
+        if (!res.ok) throw new Error(res.status === 429 ? '요청이 너무 많아요. 잠시 후 다시 시도하세요.' : 'API 오류 (' + res.status + '): API Key를 확인하세요.');
+        const data = await res.json();
+        if (!data.hits.length) { messageEl.textContent = '검색 결과가 없어요.'; return false; }
+        hits = data.hits;
+        totalHits = data.totalHits;
+        messageEl.textContent = '';
+        return true;
+      } catch (err) {
+        messageEl.textContent = err.message || '불러오기에 실패했어요.';
+        return false;
+      }
+    }
+
+    function render() {
+      trackEl.innerHTML = '';
+      dotsEl.innerHTML = '';
+      hits.forEach((h, i) => {
+        const slide = document.createElement('div');
+        slide.className = 'slide';
+        const img = document.createElement('img');
+        img.src = h.webformatURL;
+        img.alt = h.tags;
+        slide.appendChild(img);
+        trackEl.appendChild(slide);
+
+        const dot = document.createElement('button');
+        dot.className = 'dot';
+        dot.setAttribute('aria-label', (i + 1) + '번째 이미지');
+        dot.addEventListener('click', () => go(i));
+        dotsEl.appendChild(dot);
+      });
+      sliderEl.classList.add('show');
+      moreBtn.disabled = page * PER_PAGE >= totalHits;
+      go(0);
+    }
+
+    function go(i) {
+      current = (i + hits.length) % hits.length;
+      trackEl.style.transform = 'translateX(' + (-100 * current) + '%)';
+      [...dotsEl.children].forEach((d, n) => d.classList.toggle('active', n === current));
+      const h = hits[current];
+      counterEl.textContent = (current + 1) + ' / ' + hits.length + '  ·  ' + h.tags;
+      sourceEl.innerHTML = '';
+      const a = document.createElement('a');
+      a.href = h.pageURL;
+      a.target = '_blank';
+      a.rel = 'noopener';
+      a.textContent = 'by ' + h.user + ' (Pixabay)';
+      sourceEl.appendChild(a);
+    }
+
+    $('form').addEventListener('submit', async e => {
+      e.preventDefault();
+      const q = queryEl.value.trim();
+      if (!q) return;
+      try { localStorage.setItem('pixabay_key', keyEl.value.trim()); } catch (err) {}
+      query = q;
+      page = 1;
+      if (await load(query, page)) render();
+    });
+
+    moreBtn.addEventListener('click', async () => {
+      if (await load(query, page + 1)) { page++; render(); }
+    });
+
+    $('prev').addEventListener('click', () => go(current - 1));
+    $('next').addEventListener('click', () => go(current + 1));
+    document.addEventListener('keydown', e => {
+      if (!sliderEl.classList.contains('show') || e.target.tagName === 'INPUT') return;
+      if (e.key === 'ArrowLeft') go(current - 1);
+      if (e.key === 'ArrowRight') go(current + 1);
+    });
+  </script>
+</body>
+</html>
