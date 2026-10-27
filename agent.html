@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>제주 에이전트 채팅</title>
+  <style>
+    :root {
+      --bg: #0b0f14;
+      --surface: #131a22;
+      --surface-2: #1a232d;
+      --line: #25303c;
+      --accent: #2dd4bf;
+      --ink: #e6edf3;
+      --muted: #8b98a6;
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
+    }
+    .chat {
+      width: 100%;
+      max-width: 640px;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      background: var(--surface);
+      border-left: 1px solid var(--line);
+      border-right: 1px solid var(--line);
+    }
+    .chat-header {
+      padding: 1rem 1.2rem;
+      border-bottom: 3px solid var(--accent);
+    }
+    .chat-header h1 { margin: 0 0 0.2rem; font-size: 1.15rem; }
+    .chat-header p { margin: 0; color: var(--muted); font-size: 0.82rem; }
+
+    #messages {
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 0.7rem;
+      padding: 1.2rem;
+    }
+    .msg {
+      max-width: 78%;
+      padding: 0.65rem 0.9rem;
+      font-size: 0.95rem;
+      line-height: 1.55;
+      word-break: break-word;
+      white-space: pre-wrap;
+    }
+    .msg.me {
+      align-self: flex-end;
+      background: var(--accent);
+      color: #04211d;
+      border-radius: 14px 14px 2px 14px;
+    }
+    .msg.agent {
+      align-self: flex-start;
+      background: var(--surface-2);
+      border: 1px solid var(--line);
+      border-radius: 14px 14px 14px 2px;
+    }
+    .msg.typing { color: var(--muted); }
+
+    #form {
+      display: flex;
+      gap: 0.5rem;
+      padding: 0.8rem 1.2rem;
+      border-top: 1px solid var(--line);
+    }
+    #input {
+      flex: 1;
+      min-width: 0;
+      padding: 0.75rem 1rem;
+      border: 1px solid var(--line);
+      background: var(--bg);
+      color: var(--ink);
+      font-size: 0.95rem;
+      outline: none;
+    }
+    #input:focus { border-color: var(--accent); }
+    #send {
+      padding: 0.75rem 1.3rem;
+      border: none;
+      background: var(--accent);
+      color: #04211d;
+      font-size: 0.95rem;
+      font-weight: 800;
+      cursor: pointer;
+    }
+    #send:hover { background: #5eead4; }
+    .note {
+      margin: 0;
+      padding: 0 1.2rem 0.8rem;
+      color: var(--muted);
+      font-size: 0.72rem;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="chat">
+    <div class="chat-header">
+      <h1>🍊 제주 에이전트</h1>
+      <p>제주도에 대해 잘 아는 친구예요</p>
+    </div>
+
+    <div id="messages" aria-live="polite"></div>
+
+    <form id="form" autocomplete="off">
+      <input id="input" type="text" placeholder="메시지를 입력하세요" aria-label="메시지 입력">
+      <button type="submit" id="send">보내기</button>
+    </form>
+    <p class="note">※ 지금 에이전트의 답은 미리 정해 둔 가짜 답이에요.</p>
+  </div>
+
+  <script>
+    const REPLIES = [
+      '안녕하세요, 박주연 님! 저는 제주도에 대해 잘 아는 에이전트예요 🌴\n제주 특산물이 궁금하신가요? 감귤, 흑돼지, 갈치 중에서 어떤 게 궁금하세요?',
+      '그럼 하나 추천해 드릴게요! 🍊\n제주에 가면 한라봉을 꼭 드셔 보세요. 과즙이 풍부하고 향이 진해서 청으로 만들어 마셔도 좋아요.',
+      '아직 공부 중이에요! 5일차에 진짜로 알아볼게요.'
+    ];
+    const REPLY_DELAY_MS = 1000;
+
+    const messagesEl = document.getElementById('messages');
+    const inputEl = document.getElementById('input');
+    let replyIndex = 0;
+
+    function addMessage(text, who) {
+      const el = document.createElement('div');
+      el.className = 'msg ' + who;
+      el.textContent = text;
+      messagesEl.appendChild(el);
+      messagesEl.scrollTop = messagesEl.scrollHeight;
+      return el;
+    }
+
+    document.getElementById('form').addEventListener('submit', e => {
+      e.preventDefault();
+      const text = inputEl.value.trim();
+      if (!text) return;
+
+      addMessage(text, 'me');
+      inputEl.value = '';
+      inputEl.focus();
+
+      const reply = REPLIES[replyIndex % REPLIES.length];
+      replyIndex++;
+      setTimeout(() => addMessage(reply, 'agent'), REPLY_DELAY_MS);
+    });
+  </script>
+</body>
+</html>
