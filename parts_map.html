@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>부품 지도</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: sans-serif;
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      padding: 1.5rem 1rem;
+      background: #f4f4f8;
+    }
+    .card {
+      position: relative;
+      width: 100%;
+      max-width: 420px;
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+    }
+    header {
+      padding: 1.5rem;
+      background: #4f46e5;
+      color: #fff;
+      text-align: center;
+    }
+    header h1 { margin: 0 0 0.25rem; font-size: 1.5rem; }
+    header p { margin: 0; font-size: 0.9rem; opacity: 0.85; }
+    nav { display: flex; border-bottom: 1px solid #e5e7eb; }
+    nav button.tab {
+      flex: 1;
+      padding: 0.8rem 0;
+      border: none;
+      border-bottom: 3px solid transparent;
+      background: none;
+      color: #6b7280;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+    nav button.tab.active {
+      color: #4f46e5;
+      border-bottom-color: #4f46e5;
+      font-weight: bold;
+    }
+    main { padding: 1.5rem 1.5rem 1.25rem; }
+    ul { list-style: none; margin: 0 0 1.5rem; padding: 0; min-height: 2.5rem; }
+    li {
+      padding: 0.6rem 0.8rem;
+      margin-bottom: 0.4rem;
+      background: #f4f4f8;
+      border-radius: 8px;
+    }
+    .counter {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      margin-bottom: 1.75rem;
+    }
+    #count { min-width: 5rem; padding: 0.3rem 0.8rem; font-size: 2.5rem; text-align: center; }
+    .counter button {
+      padding: 0.6rem 1.1rem;
+      border: none;
+      border-radius: 8px;
+      background: #4f46e5;
+      color: #fff;
+      font-size: 1.1rem;
+      cursor: pointer;
+    }
+    .counter [data-label]::after { top: -12px; right: 0; }
+    .add { display: flex; gap: 0.5rem; }
+    .add .field { flex: 1; display: flex; }
+    .add input {
+      flex: 1;
+      min-width: 0;
+      padding: 0.6rem 0.8rem;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      font-size: 1rem;
+    }
+    .add button {
+      padding: 0.6rem 1.1rem;
+      border: none;
+      border-radius: 8px;
+      background: #4f46e5;
+      color: #fff;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+    footer {
+      padding: 0.9rem;
+      background: #f9fafb;
+      border-top: 1px solid #e5e7eb;
+      color: #6b7280;
+      font-size: 0.85rem;
+      text-align: center;
+    }
+
+    /* 이름표 */
+    [data-label] {
+      position: relative;
+      outline: 2px dashed #f97316;
+      outline-offset: -3px;
+    }
+    [data-label]::after {
+      content: attr(data-label);
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      z-index: 2;
+      padding: 0.15rem 0.55rem;
+      border-radius: 999px;
+      background: #f97316;
+      color: #fff;
+      font-size: 0.75rem;
+      font-weight: bold;
+      line-height: 1.3;
+      white-space: nowrap;
+      pointer-events: none;
+    }
+    header[data-label]::after { top: 28px; right: auto; left: 8px; }
+    .add [data-label]::after { top: -12px; right: 0; }
+    ul[data-label]::after { top: -12px; }
+    .hint { margin: 0; font-size: 0.85rem; color: #6b7280; }
+  </style>
+</head>
+<body>
+  <div class="card" data-label="카드">
+    <header data-label="헤더">
+      <h1>내 취향 카드</h1>
+      <p>좋아하는 것들을 모아 보세요</p>
+    </header>
+    <nav data-label="탭">
+      <button class="tab active" data-tab="food">음식</button>
+      <button class="tab" data-tab="music">음악</button>
+      <button class="tab" data-tab="place">장소</button>
+    </nav>
+    <main>
+      <div class="counter">
+        <span id="count" data-label="카운트">0</span>
+        <button id="plus" data-label="버튼">+1</button>
+      </div>
+      <ul id="list" data-label="목록"></ul>
+      <div class="add">
+        <span class="field" data-label="입력창"><input id="input" type="text" placeholder="좋아하는 것을 입력"></span>
+        <button id="add" data-label="버튼">추가</button>
+      </div>
+    </main>
+    <footer>© 내 취향 카드</footer>
+  </div>
+  <p class="hint">주황색 점선과 이름표가 붙은 곳이 각각의 화면 부품이에요.</p>
+  <script>
+    const items = { food: ['감귤', '흑돼지'], music: [], place: ['제주도'] };
+    let tab = 'food';
+    const listEl = document.getElementById('list');
+    const inputEl = document.getElementById('input');
+
+    function render() {
+      listEl.innerHTML = '';
+      items[tab].forEach(text => {
+        const li = document.createElement('li');
+        li.textContent = text;
+        listEl.appendChild(li);
+      });
+    }
+
+    document.querySelectorAll('.tab').forEach(btn => {
+      btn.addEventListener('click', () => {
+        tab = btn.dataset.tab;
+        document.querySelectorAll('.tab').forEach(b => b.classList.toggle('active', b === btn));
+        render();
+      });
+    });
+
+    function add() {
+      const text = inputEl.value.trim();
+      if (!text) return;
+      items[tab].push(text);
+      inputEl.value = '';
+      render();
+    }
+    document.getElementById('add').addEventListener('click', add);
+    inputEl.addEventListener('keydown', e => { if (e.key === 'Enter') add(); });
+
+    let count = 0;
+    document.getElementById('plus').addEventListener('click', () => {
+      count++;
+      document.getElementById('count').textContent = count;
+    });
+
+    render();
+  </script>
+</body>
+</html>
