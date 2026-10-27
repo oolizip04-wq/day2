@@ -6,148 +6,193 @@
   <title>제주 특산물 이야기</title>
   <style>
     :root {
-      --sea: #0ea5a4;
-      --sea-dark: #0b7285;
-      --sea-deep: #083d56;
-      --sand: #fff8ef;
+      --bg: #0b0f14;
+      --surface: #131a22;
+      --surface-2: #1a232d;
+      --line: #25303c;
+      --accent: #2dd4bf;
+      --accent-dark: #14b8a6;
       --citrus: #ff9f1c;
-      --citrus-dark: #ff6b35;
-      --ink: #25364a;
-      --muted: #6b7c8f;
+      --ink: #e6edf3;
+      --muted: #8b98a6;
     }
-    * { box-sizing: border-box; }
+    * { box-sizing: border-box; border-radius: 0 !important; }
     body {
       margin: 0;
       font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
-      background: var(--sand);
+      background: var(--bg);
       color: var(--ink);
       scroll-behavior: smooth;
     }
-    .page { max-width: 1080px; margin: 0 auto; padding: 0 1rem 2rem; }
+    .page { max-width: 1120px; margin: 0 auto; padding: 0 1rem 2rem; }
 
     /* header */
     header {
       margin: 0 -1rem;
-      padding: 3.2rem 1rem 3.6rem;
-      background: linear-gradient(135deg, var(--sea-dark) 0%, var(--sea) 55%, #5eead4 100%);
-      color: #fff;
-      text-align: center;
-      border-radius: 0 0 40px 40px;
-      box-shadow: 0 10px 30px rgba(11, 114, 133, 0.25);
+      padding: 3.2rem 1.5rem 3rem;
+      background: var(--surface);
+      border-bottom: 3px solid var(--accent);
+      text-align: left;
     }
-    header h1 { margin: 0 0 0.6rem; font-size: 2.1rem; letter-spacing: -0.02em; }
-    header p { margin: 0; font-size: 1.05rem; opacity: 0.95; }
+    header h1 {
+      max-width: 1120px;
+      margin: 0 auto 0.5rem;
+      font-size: 2.2rem;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+      text-transform: uppercase;
+    }
+    header p { max-width: 1120px; margin: 0 auto; color: var(--muted); font-size: 1rem; }
 
     /* nav */
     nav {
       position: sticky;
-      top: 0.75rem;
+      top: 0;
       z-index: 10;
       display: flex;
       flex-wrap: wrap;
-      justify-content: center;
-      gap: 0.3rem;
-      width: fit-content;
-      max-width: 100%;
-      margin: -1.6rem auto 0;
-      padding: 0.4rem;
-      background: rgba(255, 255, 255, 0.94);
-      backdrop-filter: blur(8px);
-      border-radius: 999px;
-      box-shadow: 0 6px 20px rgba(8, 61, 86, 0.18);
+      margin: 0 -1rem;
+      padding: 0 1rem;
+      background: rgba(11, 15, 20, 0.95);
+      backdrop-filter: blur(6px);
+      border-bottom: 1px solid var(--line);
     }
     nav a {
-      padding: 0.5rem 1.1rem;
-      border-radius: 999px;
-      color: var(--sea-deep);
-      font-size: 0.95rem;
+      padding: 0.95rem 1.3rem;
+      border-bottom: 2px solid transparent;
+      color: var(--muted);
+      font-size: 0.88rem;
       font-weight: bold;
+      letter-spacing: 0.04em;
       text-decoration: none;
-      transition: background 0.2s, color 0.2s;
+      transition: color 0.15s, border-color 0.15s;
     }
-    nav a:hover { background: var(--sea); color: #fff; }
+    nav a:hover { color: var(--accent); border-bottom-color: var(--accent); }
 
-    /* layout: section/article on the left, aside on the right */
+    /* layout */
     .layout {
       display: grid;
       grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
       grid-template-areas:
         "section aside"
         "article aside";
-      gap: 1.5rem;
-      margin-top: 2.2rem;
+      gap: 1.25rem;
+      margin-top: 1.75rem;
     }
     #products { grid-area: section; }
     #why { grid-area: article; }
-    aside { grid-area: aside; display: flex; flex-direction: column; gap: 1.5rem; align-self: start; }
+    aside { grid-area: aside; display: flex; flex-direction: column; gap: 1.25rem; align-self: start; }
 
     .box {
-      background: #fff;
-      border-radius: 20px;
-      box-shadow: 0 6px 22px rgba(8, 61, 86, 0.08);
-      padding: 1.6rem 1.7rem;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-top: 3px solid var(--accent);
+      padding: 1.5rem 1.6rem;
     }
-    .box h2 { margin: 0 0 0.4rem; color: var(--sea-dark); font-size: 1.3rem; }
-    .box .lead { margin: 0 0 1.2rem; color: var(--muted); font-size: 0.92rem; }
+    #why { border-top-color: var(--citrus); }
+    .box h2 { margin: 0 0 0.4rem; color: var(--ink); font-size: 1.2rem; letter-spacing: 0.01em; }
+    .box .lead { margin: 0 0 1.2rem; color: var(--muted); font-size: 0.9rem; }
 
-    /* section: product grid */
+    /* product grid */
     .grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-      gap: 0.9rem;
+      gap: 1px;
+      background: var(--line);
+      border: 1px solid var(--line);
     }
     .product {
-      padding: 1rem 0.9rem;
-      border-radius: 16px;
-      background: linear-gradient(160deg, #fff 0%, #effcfb 100%);
-      border: 1px solid #c8f0ee;
+      padding: 1.1rem 0.9rem;
+      background: var(--surface-2);
       text-align: center;
-      transition: transform 0.2s, box-shadow 0.2s;
+      transition: background 0.15s;
     }
-    .product:hover { transform: translateY(-4px); box-shadow: 0 10px 22px rgba(8, 61, 86, 0.12); }
-    .product .emoji { font-size: 2.2rem; line-height: 1.2; }
-    .product h3 { margin: 0.4rem 0 0.3rem; font-size: 1.02rem; color: var(--sea-deep); }
-    .product p { margin: 0; font-size: 0.85rem; line-height: 1.5; color: var(--muted); }
+    .product:hover { background: #20303d; }
+    .product .emoji { font-size: 2rem; line-height: 1.2; }
+    .product h3 { margin: 0.45rem 0 0.3rem; font-size: 1rem; color: var(--accent); }
+    .product p { margin: 0; color: var(--muted); font-size: 0.82rem; line-height: 1.5; }
     .product button {
-      margin-top: 0.7rem;
-      padding: 0.35rem 0.9rem;
-      border: 1px solid var(--sea);
-      border-radius: 999px;
-      background: #fff;
-      color: var(--sea-dark);
-      font-size: 0.82rem;
+      margin-top: 0.75rem;
+      padding: 0.35rem 1rem;
+      border: 1px solid var(--accent);
+      background: transparent;
+      color: var(--accent);
+      font-size: 0.8rem;
       font-weight: bold;
+      letter-spacing: 0.05em;
       cursor: pointer;
-      transition: background 0.2s, color 0.2s;
+      transition: background 0.15s, color 0.15s;
     }
-    .product button:hover { background: var(--sea); color: #fff; }
+    .product button:hover { background: var(--accent); color: #04211d; }
 
     /* article */
-    article h3 { margin: 1.3rem 0 0.4rem; color: var(--citrus-dark); font-size: 1.05rem; }
-    article p { margin: 0 0 0.6rem; font-size: 0.95rem; line-height: 1.75; }
-    article ul { margin: 0 0 0.6rem; padding-left: 1.2rem; line-height: 1.8; font-size: 0.95rem; }
+    article h3 {
+      margin: 1.4rem 0 0.4rem;
+      padding-left: 0.6rem;
+      border-left: 3px solid var(--citrus);
+      color: var(--citrus);
+      font-size: 1rem;
+    }
+    article p { margin: 0 0 0.6rem; color: #c9d4de; font-size: 0.93rem; line-height: 1.75; }
+    article ul { margin: 0 0 0.6rem; padding-left: 1.2rem; color: #c9d4de; font-size: 0.93rem; line-height: 1.8; }
     .quote {
-      margin: 1.2rem 0 0;
+      margin: 1.3rem 0 0;
       padding: 0.9rem 1.1rem;
-      background: #fff3df;
-      border-left: 4px solid var(--citrus);
-      border-radius: 10px;
-      color: #8a4b00;
-      font-size: 0.93rem;
+      background: var(--surface-2);
+      border-left: 3px solid var(--accent);
+      color: var(--ink);
+      font-size: 0.92rem;
       line-height: 1.6;
     }
 
     /* aside */
-    aside .box { padding: 1.4rem 1.4rem; }
-    aside h2 { font-size: 1.1rem; }
+    aside .box { padding: 1.3rem 1.3rem; }
+    aside h2 { font-size: 1.05rem; }
+    #today-box { border-top-color: var(--citrus); }
+    .today-date { margin: 0 0 0.9rem; color: var(--muted); font-size: 0.8rem; letter-spacing: 0.05em; }
+    .today-pick { display: flex; align-items: center; gap: 0.9rem; margin-bottom: 0.8rem; }
+    .today-emoji {
+      flex: none;
+      width: 3.4rem;
+      height: 3.4rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--surface-2);
+      border: 1px solid var(--line);
+      font-size: 2rem;
+    }
+    .today-pick h3 { margin: 0 0 0.2rem; color: var(--citrus); font-size: 1.1rem; }
+    .today-pick p { margin: 0; color: var(--muted); font-size: 0.85rem; line-height: 1.5; }
+    .today-tip {
+      margin: 0 0 0.9rem;
+      padding: 0.7rem 0.8rem;
+      background: var(--surface-2);
+      border-left: 3px solid var(--citrus);
+      color: #f1d9b0;
+      font-size: 0.86rem;
+      line-height: 1.55;
+    }
+    .today-add {
+      width: 100%;
+      padding: 0.6rem 1rem;
+      border: 1px solid var(--citrus);
+      background: transparent;
+      color: var(--citrus);
+      font-size: 0.88rem;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+    }
+    .today-add:hover { background: var(--citrus); color: #2a1800; }
     #fact {
       min-height: 4.2rem;
       margin: 0 0 0.9rem;
       padding: 0.8rem 0.9rem;
-      background: #fff3df;
-      border-left: 4px solid var(--citrus);
-      border-radius: 10px;
-      color: #8a4b00;
+      background: var(--surface-2);
+      border-left: 3px solid var(--citrus);
+      color: #f1d9b0;
       font-size: 0.9rem;
       line-height: 1.55;
     }
@@ -155,70 +200,82 @@
       width: 100%;
       padding: 0.7rem 1rem;
       border: none;
-      border-radius: 999px;
-      background: linear-gradient(135deg, var(--citrus), var(--citrus-dark));
-      color: #fff;
-      font-size: 0.95rem;
-      font-weight: bold;
-      box-shadow: 0 6px 16px rgba(255, 107, 53, 0.3);
+      background: var(--accent);
+      color: #04211d;
+      font-size: 0.9rem;
+      font-weight: 800;
+      letter-spacing: 0.04em;
       cursor: pointer;
-      transition: transform 0.15s;
+      transition: background 0.15s;
     }
-    #fact-btn:hover { transform: translateY(-2px); }
+    #fact-btn:hover { background: #5eead4; }
     .add-form { display: flex; gap: 0.4rem; margin-bottom: 0.8rem; }
     .add-form input {
       flex: 1;
       min-width: 0;
-      padding: 0.6rem 0.9rem;
-      border: 2px solid #c8f0ee;
-      border-radius: 999px;
-      background: #f7fefd;
-      font-size: 0.92rem;
+      padding: 0.6rem 0.8rem;
+      border: 1px solid var(--line);
+      background: var(--bg);
       color: var(--ink);
+      font-size: 0.9rem;
       outline: none;
     }
-    .add-form input:focus { border-color: var(--sea); box-shadow: 0 0 0 3px rgba(14, 165, 164, 0.15); }
+    .add-form input::placeholder { color: #5b6876; }
+    .add-form input:focus { border-color: var(--accent); }
     .add-form button {
       padding: 0.6rem 1rem;
       border: none;
-      border-radius: 999px;
-      background: linear-gradient(135deg, var(--sea), var(--sea-dark));
-      color: #fff;
-      font-size: 0.92rem;
-      font-weight: bold;
+      background: var(--accent);
+      color: #04211d;
+      font-size: 0.9rem;
+      font-weight: 800;
       cursor: pointer;
     }
+    .add-form button:hover { background: #5eead4; }
     .wish { list-style: none; margin: 0; padding: 0; }
     .wish li {
-      margin-bottom: 0.4rem;
+      margin-bottom: 0.35rem;
       padding: 0.55rem 0.8rem;
-      background: #effcfb;
-      border-radius: 10px;
+      background: var(--surface-2);
+      border-left: 2px solid var(--accent);
       font-size: 0.9rem;
       word-break: break-word;
     }
-    .wish li.empty { background: none; color: var(--muted); text-align: center; }
-    .tips { margin: 0; padding-left: 1.1rem; font-size: 0.9rem; line-height: 1.8; }
+    .wish li { display: flex; align-items: center; justify-content: space-between; gap: 0.6rem; }
+    .wish .del {
+      flex: none;
+      padding: 0.2rem 0.6rem;
+      border: 1px solid #5b6876;
+      background: transparent;
+      color: var(--muted);
+      font-size: 0.75rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+    }
+    .wish .del:hover { background: #e5484d; border-color: #e5484d; color: #fff; }
+    .wish li.empty { background: none; border-left: none; color: var(--muted); text-align: center; }
+    .tips { margin: 0; padding-left: 1.1rem; color: #c9d4de; font-size: 0.88rem; line-height: 1.8; }
 
     /* footer */
     footer {
       margin: 2rem -1rem -2rem;
       padding: 2rem 1rem;
-      background: var(--sea-deep);
-      color: #b9d3df;
-      font-size: 0.85rem;
+      background: var(--surface);
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 0.82rem;
       line-height: 1.7;
       text-align: center;
-      border-radius: 40px 40px 0 0;
     }
-    footer strong { color: #fff; }
+    footer strong { color: var(--accent); letter-spacing: 0.05em; }
 
     @media (max-width: 760px) {
       .layout {
         grid-template-columns: 1fr;
         grid-template-areas: "section" "article" "aside";
       }
-      header h1 { font-size: 1.7rem; }
+      header h1 { font-size: 1.6rem; }
     }
   </style>
 </head>
@@ -318,6 +375,20 @@
       </article>
 
       <aside>
+        <div class="box" id="today-box">
+          <h2>⭐ 오늘의 추천</h2>
+          <p class="today-date" id="today-date"></p>
+          <div class="today-pick">
+            <div class="today-emoji" id="today-emoji"></div>
+            <div>
+              <h3 id="today-name"></h3>
+              <p id="today-desc"></p>
+            </div>
+          </div>
+          <p class="today-tip" id="today-tip"></p>
+          <button id="today-add" class="today-add">담기</button>
+        </div>
+
         <div class="box" id="fact-box">
           <h2>💡 제주 알아보기</h2>
           <p id="fact">버튼을 눌러 제주도 이야기를 들어보세요 🌴</p>
@@ -382,7 +453,23 @@
       const empty = wishEl.querySelector('.empty');
       if (empty) empty.remove();
       const li = document.createElement('li');
-      li.textContent = '🧺 ' + text;
+      const label = document.createElement('span');
+      label.textContent = '🧺 ' + text;
+      const del = document.createElement('button');
+      del.type = 'button';
+      del.className = 'del';
+      del.textContent = '빼기';
+      del.setAttribute('aria-label', text + ' 빼기');
+      del.addEventListener('click', () => {
+        li.remove();
+        if (!wishEl.children.length) {
+          const empty = document.createElement('li');
+          empty.className = 'empty';
+          empty.textContent = '아직 담은 특산물이 없어요.';
+          wishEl.appendChild(empty);
+        }
+      });
+      li.append(label, del);
       wishEl.appendChild(li);
     }
 
@@ -392,6 +479,27 @@
         document.getElementById('wish-box').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       });
     });
+
+    const picks = [
+      { emoji: '🍊', name: '감귤', desc: '새콤달콤한 제주의 대표 과일', tip: '껍질째 먹기 좋은 간식! 가을~겨울이 제철이에요.' },
+      { emoji: '🍋', name: '한라봉', desc: '꼭지가 볼록, 과즙이 풍부해요', tip: '청으로 만들어 차나 에이드로 즐겨보세요.' },
+      { emoji: '🧡', name: '천혜향', desc: '향이 진하고 당도가 높아요', tip: '향이 좋아 선물용으로도 인기가 많아요.' },
+      { emoji: '🐖', name: '흑돼지', desc: '쫄깃하고 고소한 육질', tip: '구이는 물론 김치찌개에 넣어도 잘 어울려요.' },
+      { emoji: '🐟', name: '옥돔', desc: '담백한 맛의 제주 생선', tip: '소금만 살짝 뿌려 구우면 담백한 맛이 살아나요.' },
+      { emoji: '🐠', name: '갈치', desc: '은빛으로 빛나는 구이·조림 별미', tip: '무를 깔고 조리면 시원하고 칼칼한 갈치조림이 돼요.' },
+      { emoji: '🍡', name: '오메기떡', desc: '쫀득한 조 떡에 팥고물', tip: '차와 함께 먹으면 간식으로 딱이에요.' },
+      { emoji: '🍵', name: '녹차', desc: '향긋한 제주의 차 한 잔', tip: '따뜻하게 우리거나 라떼로 즐겨보세요.' }
+    ];
+    const now = new Date();
+    const dayNumber = Math.floor(new Date(now.getFullYear(), now.getMonth(), now.getDate()) / 86400000);
+    const pick = picks[dayNumber % picks.length];
+    document.getElementById('today-date').textContent =
+      now.getFullYear() + '. ' + (now.getMonth() + 1) + '. ' + now.getDate() + '  TODAY';
+    document.getElementById('today-emoji').textContent = pick.emoji;
+    document.getElementById('today-name').textContent = pick.name;
+    document.getElementById('today-desc').textContent = pick.desc;
+    document.getElementById('today-tip').textContent = '💬 ' + pick.tip;
+    document.getElementById('today-add').addEventListener('click', () => addWish(pick.name));
 
     const addInput = document.getElementById('add-input');
     document.getElementById('add-form').addEventListener('submit', e => {
