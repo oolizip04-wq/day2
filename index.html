@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>카운터</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+      background: #f4f4f8;
+    }
+    #count {
+      font-size: 4rem;
+      margin-bottom: 1rem;
+    }
+    button {
+      font-size: 1.25rem;
+      padding: 0.6rem 1.5rem;
+      border: none;
+      border-radius: 8px;
+      background: #4f46e5;
+      color: #fff;
+      cursor: pointer;
+    }
+    button:hover { background: #4338ca; }
+  </style>
+</head>
+<body>
+  <div id="count">0</div>
+  <button id="btn">+2</button>
+  <script>
+    let count = 0;
+    const countEl = document.getElementById('count');
+    document.getElementById('btn').addEventListener('click', () => {
+      count+=2;
+      countEl.textContent = count;
+    });
+  </script>
+</body>
+</html>
