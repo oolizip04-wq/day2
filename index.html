@@ -263,7 +263,7 @@
     .slider { border: 1px solid var(--line); background: var(--bg); }
     .slider[hidden] { display: none; }
     .stage { position: relative; height: 420px; overflow: hidden; background: #05080c; }
-    .track { display: flex; height: 100%; transition: transform 0.4s ease; }
+    .track { display: flex; height: 100%; transition: transform 0.3s ease; }
     .slide { flex: none; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
     .slide img { max-width: 100%; max-height: 100%; object-fit: contain; }
     .arrow {
@@ -466,9 +466,9 @@
 
     <section class="box" id="gallery">
       <h2>🖼️ 제주 이미지 갤러리</h2>
-      <p class="lead">궁금한 것을 검색하면 사진을 10장씩 슬라이드로 보여드려요.</p>
+      <p class="lead">궁금한 것을 입력하고 검색하면 사진이 0.5초마다 한 장씩 슬라이드돼요. (10장씩)</p>
       <form id="gallery-form" class="add-form">
-        <input id="gallery-query" type="text" value="제주도" placeholder="예: 감귤, 한라산, 바다" autocomplete="off">
+        <input id="gallery-query" type="text" placeholder="예: 감귤, 한라산, 바다" autocomplete="off">
         <button type="submit">검색</button>
       </form>
       <p id="gallery-msg" class="gallery-msg"></p>
@@ -482,6 +482,7 @@
           <span id="g-counter"></span>
           <span id="g-source"></span>
         </div>
+        <button type="button" id="g-play" class="g-more">⏸ 멈춤</button>
         <div class="dots" id="dots"></div>
         <button type="button" id="g-more" class="g-more">다음 10개 불러오기</button>
       </div>
@@ -622,6 +623,7 @@
       gSlider.hidden = false;
       gMore.disabled = gPage * 10 >= gTotal;
       gGo(0);
+      gStart();
     }
 
     function gGo(i) {
@@ -640,6 +642,23 @@
       src.appendChild(a);
     }
 
+    // 0.5초마다 다음 이미지로 자동 슬라이드
+    const SLIDE_MS = 500;
+    const gPlayBtn = document.getElementById('g-play');
+    let gTimer = null;
+    function gStart() {
+      gStop();
+      if (!gHits.length) return;
+      gTimer = setInterval(() => gGo(gCurrent + 1), SLIDE_MS);
+      gPlayBtn.textContent = '⏸ 멈춤';
+    }
+    function gStop() {
+      clearInterval(gTimer);
+      gTimer = null;
+      gPlayBtn.textContent = '▶ 재생';
+    }
+    function gRestart() { if (gTimer) gStart(); }
+
     async function gSearch(term) {
       gTerm = term;
       gPage = 1;
@@ -654,9 +673,11 @@
     gMore.addEventListener('click', async () => {
       if (await gLoad(gTerm, gPage + 1)) { gPage++; gRender(); }
     });
-    document.getElementById('g-prev').addEventListener('click', () => gGo(gCurrent - 1));
-    document.getElementById('g-next').addEventListener('click', () => gGo(gCurrent + 1));
-    gSearch(gQuery.value.trim());
+    document.getElementById('g-prev').addEventListener('click', () => { gGo(gCurrent - 1); gRestart(); });
+    document.getElementById('g-next').addEventListener('click', () => { gGo(gCurrent + 1); gRestart(); });
+    gPlayBtn.addEventListener('click', () => {
+      if (gTimer) gStop(); else gStart();
+    });
 
     const addInput = document.getElementById('add-input');
     document.getElementById('add-form').addEventListener('submit', e => {
