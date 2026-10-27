@@ -1,85 +1,185 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>내 취향 카드</title>
   <style>
+    :root {
+      --sea: #0ea5a4;
+      --sea-dark: #0b7285;
+      --sea-deep: #083d56;
+      --sand: #fff8ef;
+      --citrus: #ff9f1c;
+      --ink: #25364a;
+      --muted: #6b7c8f;
+    }
     * { box-sizing: border-box; }
     body {
       margin: 0;
-      font-family: 'Malgun Gothic', sans-serif;
-      background: #f4f4f8;
-      color: #333;
+      font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
+      background: linear-gradient(180deg, #e6f7f6 0%, var(--sand) 420px, var(--sand) 100%);
+      background-attachment: fixed;
+      color: var(--ink);
       scroll-behavior: smooth;
     }
     header {
-      padding: 1.5rem 1rem;
-      background: #ff7a00;
+      padding: 3rem 1rem 3.5rem;
+      background: linear-gradient(135deg, var(--sea-dark) 0%, var(--sea) 55%, #5eead4 100%);
       color: #fff;
       text-align: center;
+      border-radius: 0 0 40px 40px;
+      box-shadow: 0 10px 30px rgba(11, 114, 133, 0.25);
     }
-    header h1 { margin: 0 0 0.4rem; font-size: 1.6rem; }
-    header p { margin: 0; font-size: 0.9rem; opacity: 0.95; }
+    header h1 {
+      margin: 0 0 0.5rem;
+      font-size: 2rem;
+      letter-spacing: -0.02em;
+      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    }
+    header p { margin: 0; font-size: 1rem; opacity: 0.92; }
     nav {
+      position: sticky;
+      top: 0.75rem;
+      z-index: 10;
       display: flex;
       justify-content: center;
-      gap: 1.5rem;
-      padding: 0.9rem 1rem;
-      background: #333;
+      gap: 0.4rem;
+      width: fit-content;
+      margin: -1.6rem auto 0;
+      padding: 0.4rem;
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(8px);
+      border-radius: 999px;
+      box-shadow: 0 6px 20px rgba(8, 61, 86, 0.18);
     }
-    nav a { color: #fff; font-size: 0.95rem; text-decoration: none; }
-    nav a:hover { color: #ffb36b; }
+    nav a {
+      padding: 0.5rem 1.2rem;
+      border-radius: 999px;
+      color: var(--sea-deep);
+      font-size: 0.95rem;
+      font-weight: bold;
+      text-decoration: none;
+      transition: background 0.2s, color 0.2s;
+    }
+    nav a:hover { background: var(--sea); color: #fff; }
     main {
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 1.5rem;
-      padding: 2rem 1rem;
+      padding: 2.5rem 1rem 2rem;
     }
     .box {
       width: 100%;
       background: #fff;
-      border-radius: 14px;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
-      padding: 1.5rem 2rem;
+      border-radius: 20px;
+      box-shadow: 0 6px 22px rgba(8, 61, 86, 0.08);
+      padding: 1.75rem 2rem;
     }
     #counter {
-      max-width: 360px;
+      max-width: 380px;
       text-align: center;
+      background: linear-gradient(160deg, #fff 0%, #effcfb 100%);
+      border: 1px solid #c8f0ee;
     }
-    #counter h2 { margin: 0 0 0.4rem; font-size: 1.1rem; }
-    #counter .desc { margin: 0; color: #777; font-size: 0.9rem; }
-    #count { margin: 1.2rem 0 0.8rem; font-size: 3.5rem; font-weight: 500; }
+    #counter h2 { margin: 0 0 0.4rem; font-size: 1.2rem; color: var(--sea-deep); }
+    #counter .desc { margin: 0; color: var(--muted); font-size: 0.9rem; }
+    #count {
+      margin: 1rem 0 0.8rem;
+      font-size: 3.8rem;
+      font-weight: bold;
+      color: var(--sea);
+      line-height: 1;
+    }
     #fact {
-      min-height: 3.2rem;
-      margin: 0 0 1rem;
-      padding: 0.7rem 0.8rem;
-      background: #fff4e8;
-      border-radius: 8px;
-      color: #7a3d00;
+      min-height: 3.4rem;
+      margin: 0 0 1.2rem;
+      padding: 0.8rem 1rem;
+      background: #fff3df;
+      border-left: 4px solid var(--citrus);
+      border-radius: 10px;
+      color: #8a4b00;
       font-size: 0.95rem;
       line-height: 1.5;
+      text-align: left;
     }
     #plus {
-      padding: 0.6rem 1.4rem;
-      border: 1px solid #999;
-      border-radius: 4px;
-      background: #efefef;
+      padding: 0.75rem 1.8rem;
+      border: none;
+      border-radius: 999px;
+      background: linear-gradient(135deg, var(--citrus), #ff6b35);
+      color: #fff;
       font-size: 1rem;
+      font-weight: bold;
+      box-shadow: 0 6px 16px rgba(255, 107, 53, 0.35);
       cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s;
     }
-    #plus:hover { background: #e2e2e2; }
-    .info { max-width: 640px; }
-    .info h2 { margin: 0 0 1rem; color: #ff7a00; font-size: 1.15rem; }
-    .info p { margin: 0 0 0.6rem; font-size: 0.95rem; line-height: 1.6; }
+    #plus:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(255, 107, 53, 0.4); }
+    #plus:active { transform: translateY(0); }
+    .info {
+      max-width: 660px;
+      border-top: 5px solid var(--sea);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .info:nth-of-type(even) { border-top-color: var(--citrus); }
+    .info:hover { transform: translateY(-3px); box-shadow: 0 12px 30px rgba(8, 61, 86, 0.14); }
+    .info h2 { margin: 0 0 1rem; color: var(--sea-dark); font-size: 1.2rem; }
+    .info p {
+      margin: 0 0 0.55rem;
+      padding-left: 1rem;
+      border-left: 2px solid #d5f1ef;
+      font-size: 0.95rem;
+      line-height: 1.65;
+    }
     .info p:last-child { margin-bottom: 0; }
+    .add-form { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
+    .add-form input {
+      flex: 1;
+      min-width: 0;
+      padding: 0.7rem 1rem;
+      border: 2px solid #c8f0ee;
+      border-radius: 999px;
+      background: #f7fefd;
+      color: var(--ink);
+      font-size: 1rem;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .add-form input:focus {
+      border-color: var(--sea);
+      box-shadow: 0 0 0 4px rgba(14, 165, 164, 0.15);
+    }
+    .add-form button {
+      padding: 0.7rem 1.4rem;
+      border: none;
+      border-radius: 999px;
+      background: linear-gradient(135deg, var(--sea), var(--sea-dark));
+      color: #fff;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: transform 0.15s;
+    }
+    .add-form button:hover { transform: translateY(-2px); }
+    .my-list { list-style: none; margin: 0; padding: 0; }
+    .my-list li {
+      margin-bottom: 0.5rem;
+      padding: 0.7rem 1rem;
+      background: #effcfb;
+      border-radius: 12px;
+      line-height: 1.5;
+      word-break: break-word;
+    }
+    .my-list li.empty { background: none; color: var(--muted); text-align: center; }
     footer {
-      padding: 1.5rem 1rem;
-      background: #333;
-      color: #bbb;
+      padding: 2rem 1rem;
+      background: var(--sea-deep);
+      color: #b9d3df;
       font-size: 0.85rem;
       text-align: center;
+      border-radius: 40px 40px 0 0;
     }
   </style>
 </head>
@@ -91,7 +191,7 @@
 
   <nav>
     <a href="#top-card">홈</a>
-    <a href="#counter">내 취향</a>
+    <a href="#mine">내 취향</a>
     <a href="#intro">소개</a>
   </nav>
 
@@ -102,6 +202,17 @@
       <div id="count">0</div>
       <p id="fact">버튼을 눌러 제주도 이야기를 들어보세요 🌴</p>
       <button id="plus">제주도 알아보기</button>
+    </section>
+
+    <section class="box info" id="mine">
+      <h2>💛 내 취향 모으기</h2>
+      <form id="add-form" class="add-form">
+        <input id="add-input" type="text" placeholder="좋아하는 것을 입력하세요" autocomplete="off">
+        <button type="submit" id="add-btn">추가</button>
+      </form>
+      <ul id="my-list" class="my-list">
+        <li class="empty">아직 추가한 취향이 없어요.</li>
+      </ul>
     </section>
 
     <section class="box info" id="intro">
@@ -264,6 +375,22 @@
       '🏝️ 배를 타고 가는 작은 섬 우도는 땅콩 아이스크림으로 유명해요.',
       '🗣️ "혼저옵서예"는 제주 말로 "어서 오세요"라는 뜻이에요.'
     ];
+    const addForm = document.getElementById('add-form');
+    const addInput = document.getElementById('add-input');
+    const myList = document.getElementById('my-list');
+    addForm.addEventListener('submit', e => {
+      e.preventDefault();
+      const text = addInput.value.trim();
+      if (!text) return;
+      const empty = myList.querySelector('.empty');
+      if (empty) empty.remove();
+      const li = document.createElement('li');
+      li.textContent = '💛 ' + text;
+      myList.appendChild(li);
+      addInput.value = '';
+      addInput.focus();
+    });
+
     let count = 0;
     let factIndex = 0;
     const countEl = document.getElementById('count');
